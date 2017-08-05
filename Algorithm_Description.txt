@@ -1,0 +1,51 @@
+For Swarm systems, we need a universal leader election technique. As the name implies, these algorithms are designed to be used in every form of process networks without any prior knowledge of the topology of a network or its properties such as its size.
+
+We shall be using an implementation of "Shout Protocol". "Shout Protocol" builds a spanning tree on a generic graph and elects its root as leader. The algorithm has a total cost linear in the edges cardinality. In future, we would like to try "Mega Merger" algorithm, which is quite similar to the "Shout Protocol" but has promises of better complexity during partitioning.
+
+Deliverables :
+
+1. Leader election: A group of swarm bots, should be able to elect a leader on their own.
+
+2. The process of leader election should be deterministic, in the sense that, the user can force a Swarm bot to act as a leader, by changing it's parameters. Hence, the leader election process, cannot be something that solely relies on run-time parameters or variables.
+
+3. Creating a hierarchy: The process should be able to create a hierarchy from the initial state. This will lead to less burden on each *leader* node.
+
+4. Partitioning and Peering: The leader must be able to divide its followers into groups and call for leader election in the groups created, thereby, creating hierarchy. The bots should be able to identify their peers, followers and leader.
+
+5. Merging : Call for merging two or more groups.
+
+Properties:
+ * No bot shall have same ID.
+ * Each bot shall have exactly one leader, with the one bot having no leader.
+
+Process :
+
+1. Change the `SwarmBot` architecture to include 3 parameters:
+	* Peer (Vector : SwarmBot ~ initialised to all bots available)
+	* Leader (SmarmBot ~ initialised to NULL)
+	* Follower ( Vector : SwarmBot ~ initialised to NULL)
+	* ElectionParameter ( Int : initialised to BOT_ID)		// For time-being. We need to think of better parameter for election
+
+2. Define a function `Election` that:
+	* Reads data from the Election.txt file
+	* Chooses the bot with minimum `ElectionParameter` as Leader
+	* Post it in Election.txt file in the format of "<Process>:<BotID>:<Parameter/Leader>"
+	* Wait for n (= number of peers) to post their leaders.
+	* Accept the most voted leader as the Leader.
+	* Remove that bot from the set of peers and set it as the leader.
+	* If the bot itself, is the leader, then set all its peers as followers
+
+3. Define a function `Partition` that:
+	* should run on the followers of the bot
+	* divide the peers into a number of groups (the number should be passed as a parameter)
+	* post the partition message in Election.txt in the specified format.
+	* initiate leader election in the partitioned groups.
+	* if the bot receives a partition message from its leader, then:
+		* the bot retains the peers who are in the same group as the bot itself, and removes others.
+	* remove all followers and set the leaders of the partitioned groups as followers
+
+4. Define a function `Merging` that:
+	* works on the followers of the specified bot.
+	* Posts on the Election.txt file to initiate merging of the specified groups.
+	* Set the followers as their peers.
+

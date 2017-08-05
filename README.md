@@ -2,7 +2,7 @@
 
 TODO (Subject to change):
 
-- [ ] Initial algorithm and its description
+- [X] Initial algorithm and its description
 
 - [ ] Changing `SwarmBot` architecture to include scope for leader and election related tasks
 
